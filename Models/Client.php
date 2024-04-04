@@ -1,7 +1,12 @@
 <?php
 
 require_once __DIR__ . '/Product.php';
+require_once __DIR__ . "/Traits/DiscountTrait.php";
+require_once __DIR__ . "/Exceptions/InvalidProductException.php";
 class Client {
+
+    use DiscountTrait;
+
     public $email;
     public $address;
 
@@ -27,7 +32,14 @@ class Client {
      * @return void
      */
     public function addToCart(Product $product) {
+        if (!$this->validateProduct($product)) {
+            throw new InvalidProductException();
+        }
         $this->cart[] = $product;
+    }
+
+    private function validateProduct(Product $product) {
+        return true;
     }
     
     /**
@@ -43,5 +55,10 @@ class Client {
         }
 
         return $total;
+    }
+
+    public function applyDiscountToCart($discount) {
+        $total = $this->getCartTotal();
+        return $this->applyDiscount($total, $discount);
     }
 }
